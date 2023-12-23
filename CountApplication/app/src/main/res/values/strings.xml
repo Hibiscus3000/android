@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CountApplication</string>
+    <string name="change_counter">change counter</string>
+    <string name="increment_counter">increment counter</string>
+    <string name="decrement_counter">decrement counter</string>
+    <string name="show_counter">show counter</string>
+    <string name="change_amount">change amount</string>
+    <string name="clear">clear</string>
+</resources>

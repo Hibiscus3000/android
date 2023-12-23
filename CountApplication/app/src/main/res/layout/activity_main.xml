@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/changeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/change_counter"
+        app:layout_constraintEnd_toEndOf="@+id/clearEditTextButton"
+        app:layout_constraintStart_toStartOf="@+id/clearEditTextButton"
+        app:layout_constraintTop_toBottomOf="@+id/clearEditTextButton" />
+
+    <Button
+        android:id="@+id/incrementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/increment_counter"
+        app:layout_constraintEnd_toEndOf="@+id/changeButton"
+        app:layout_constraintStart_toStartOf="@+id/changeButton"
+        app:layout_constraintTop_toBottomOf="@+id/changeButton" />
+
+    <Button
+        android:id="@+id/decrementButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/decrement_counter"
+        app:layout_constraintEnd_toEndOf="@+id/incrementButton"
+        app:layout_constraintStart_toStartOf="@+id/incrementButton"
+        app:layout_constraintTop_toBottomOf="@+id/incrementButton" />
+
+    <Button
+        android:id="@+id/showButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/show_counter"
+        app:layout_constraintEnd_toEndOf="@+id/decrementButton"
+        app:layout_constraintHorizontal_bias="0.485"
+        app:layout_constraintStart_toStartOf="@+id/decrementButton"
+        app:layout_constraintTop_toBottomOf="@+id/decrementButton" />
+
+    <EditText
+        android:id="@+id/changeAmountEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/change_amount"
+        android:inputType="numberSigned"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <Button
+        android:id="@+id/clearEditTextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="clear"
+        app:layout_constraintEnd_toEndOf="@+id/changeAmountEditText"
+        app:layout_constraintStart_toStartOf="@+id/changeAmountEditText"
+        app:layout_constraintTop_toBottomOf="@+id/changeAmountEditText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
