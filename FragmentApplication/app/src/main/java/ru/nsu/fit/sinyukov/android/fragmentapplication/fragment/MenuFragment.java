@@ -9,7 +9,9 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import ru.nsu.fit.sinyukov.android.fragmentapplication.BackButtonVisibilityViewModel;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.MainActivity;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
@@ -26,6 +28,14 @@ public class MenuFragment extends Fragment {
         setButtonOnClickListener(view.findViewById(R.id.menuButton1), "111");
         setButtonOnClickListener(view.findViewById(R.id.menuButton2), "222");
         setButtonOnClickListener(view.findViewById(R.id.menuButton3), "333");
+        view.findViewById(R.id.backButton).setOnClickListener(v -> ((MainActivity) getActivity()).popBackStack());
+
+        new ViewModelProvider(requireActivity()).get(BackButtonVisibilityViewModel.class)
+                .getVisibility()
+                .observe(getViewLifecycleOwner(), newVisibility -> getView()
+                        .findViewById(R.id.backButton)
+                        .setVisibility(newVisibility));
+
         return view;
     }
 

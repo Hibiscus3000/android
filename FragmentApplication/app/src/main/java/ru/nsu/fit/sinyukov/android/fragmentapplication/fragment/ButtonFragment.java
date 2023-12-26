@@ -9,13 +9,17 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import ru.nsu.fit.sinyukov.android.fragmentapplication.BackButtonVisibilityViewModel;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
 public class ButtonFragment extends Fragment {
 
     private static String ARG_TEXT = "text";
     public static String TRANSACTION_NAME = "B2T";
+
+    private BackButtonVisibilityViewModel visibilityViewModel;
 
     public static ButtonFragment create(String text) {
         final ButtonFragment buttonFragment = new ButtonFragment();
@@ -36,11 +40,15 @@ public class ButtonFragment extends Fragment {
         final Button button = view.findViewById(R.id.button);
         final String text = getArguments().getString(ARG_TEXT);
         button.setText(text);
+
+        visibilityViewModel = new ViewModelProvider(requireActivity()).get(BackButtonVisibilityViewModel.class);
+
         button.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.containerItem, TextFragment.create(text))
                     .addToBackStack(TRANSACTION_NAME)
                     .commit();
+            visibilityViewModel.setVisibility(View.VISIBLE);
         });
         return view;
     }
