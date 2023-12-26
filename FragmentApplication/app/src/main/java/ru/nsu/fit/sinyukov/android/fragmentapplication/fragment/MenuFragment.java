@@ -28,7 +28,8 @@ public class MenuFragment extends Fragment {
         setButtonOnClickListener(view.findViewById(R.id.menuButton1), "111");
         setButtonOnClickListener(view.findViewById(R.id.menuButton2), "222");
         setButtonOnClickListener(view.findViewById(R.id.menuButton3), "333");
-        view.findViewById(R.id.backButton).setOnClickListener(v -> ((MainActivity) getActivity()).popBackStack());
+        view.findViewById(R.id.backButton).setOnClickListener(v -> ((MainActivity) getActivity())
+                .popBackStack(ButtonFragment.BUTTON_TO_TEXT));
 
         new ViewModelProvider(requireActivity()).get(BackButtonVisibilityViewModel.class)
                 .getVisibility()

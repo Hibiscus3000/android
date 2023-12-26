@@ -6,11 +6,6 @@
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/containerMenu"
-        android:layout_width="100dp"
-        android:layout_height="match_parent" />
-
-    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/containerItem"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -17,7 +17,8 @@ import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 public class ButtonFragment extends Fragment {
 
     private static String ARG_TEXT = "text";
-    public static String TRANSACTION_NAME = "B2T";
+    public static String BUTTON_TO_TEXT = "Button to text";
+    public static String ADD_BUTTON = "Add button";
 
     private BackButtonVisibilityViewModel visibilityViewModel;
 
@@ -46,7 +47,7 @@ public class ButtonFragment extends Fragment {
         button.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.containerItem, TextFragment.create(text))
-                    .addToBackStack(TRANSACTION_NAME)
+                    .addToBackStack(BUTTON_TO_TEXT)
                     .commit();
             visibilityViewModel.setVisibility(View.VISIBLE);
         });
