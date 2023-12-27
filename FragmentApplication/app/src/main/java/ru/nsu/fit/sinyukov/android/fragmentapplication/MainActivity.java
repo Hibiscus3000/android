@@ -2,7 +2,6 @@ package ru.nsu.fit.sinyukov.android.fragmentapplication;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.View;
 import android.window.OnBackInvokedDispatcher;
 
 import androidx.activity.OnBackPressedCallback;
@@ -13,12 +12,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.ButtonFragment;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.MenuFragment;
+import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.MenuFragmentActionListener;
+import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.TextFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MenuFragmentActionListener {
 
-    private static final String INITIAL_TEXT = "AAAAAA";
+    private static final String INITIAL_TEXT = "Initial text";
 
-    private BackButtonVisibilityViewModel backButtonVisibilityViewModel;
+    private FragmentsViewModel fragmentsViewModel;
+    private boolean inLandscape;
 
     @BuildCompat.PrereleaseSdkCheck
     @Override
@@ -26,16 +28,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        backButtonVisibilityViewModel = new ViewModelProvider(this).get(BackButtonVisibilityViewModel.class);
+        fragmentsViewModel = new ViewModelProvider(this).get(FragmentsViewModel.class);
 
-        if (null == savedInstanceState) {
-            final boolean inLandscape = Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation;
-            getSupportFragmentManager().beginTransaction()
-                    .add(inLandscape ? R.id.containerMenu : R.id.containerItem, new MenuFragment())
-                    .commit();
-            if (inLandscape) {
-                showButtonFragment(INITIAL_TEXT);
-            }
+        inLandscape = Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation;
+
+        if (inLandscape || null == savedInstanceState) {
+            createMenu();
+        }
+        if (null != savedInstanceState) {
+            showFragmentFromViewModel();
+        }
+        if (inLandscape && null == savedInstanceState) {
+            showButtonFragment(INITIAL_TEXT);
         }
 
         if (BuildCompat.isAtLeastT()) {
@@ -51,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void createMenu() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container1, MenuFragment.create(this))
+                .commit();
+    }
+
     private void backPressed() {
         if (0 != getSupportFragmentManager().getBackStackEntryCount()) {
             popBackStack(null);
@@ -59,17 +69,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void popBackStack(String transactionName) {
-        backButtonVisibilityViewModel.setVisibility(View.INVISIBLE);
+    // could delete this and use backPressed() instead
+    @Override
+    public void backPressed(String transactionName) {
+        popBackStack(transactionName);
+    }
+
+    private void popBackStack(String transactionName) {
+        fragmentsViewModel.setFragmentType(FragmentsViewModel.FragmentType.BUTTON);
         getSupportFragmentManager().popBackStack(
                 transactionName, null == transactionName ? 0 : FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
-    public void showButtonFragment(String text) {
-        popBackStack(ButtonFragment.ADD_BUTTON);
+    private void showFragmentFromViewModel() {
+        showFragment(fragmentsViewModel.getFragmentType().getValue(), fragmentsViewModel.getText().getValue());
+    }
+
+    private void showFragment(FragmentsViewModel.FragmentType fragmentType, String text) {
+        boolean isButton = FragmentsViewModel.FragmentType.BUTTON == fragmentType;
+
+        fragmentsViewModel.setFragmentType(fragmentType);
+        fragmentsViewModel.setText(text);
+        popBackStack(isButton ? ButtonFragment.ADD_BUTTON : ButtonFragment.BUTTON_TO_TEXT);
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.containerItem, ButtonFragment.create(text))
+                .replace(inLandscape ? R.id.container2 : R.id.container1,
+                        isButton ? ButtonFragment.create(text) : TextFragment.create(text))
                 .addToBackStack(ButtonFragment.ADD_BUTTON)
                 .commit();
+    }
+
+    @Override
+    public void showButtonFragment(String text) {
+        showFragment(FragmentsViewModel.FragmentType.BUTTON, text);
     }
 }
