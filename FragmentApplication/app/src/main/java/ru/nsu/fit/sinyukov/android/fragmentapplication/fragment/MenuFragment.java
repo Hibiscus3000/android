@@ -1,5 +1,6 @@
 package ru.nsu.fit.sinyukov.android.fragmentapplication.fragment;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +17,7 @@ import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
 public class MenuFragment extends Fragment {
 
-    private MenuFragmentActionListener menuFragmentActionListener;
-
-    public static MenuFragment create(MenuFragmentActionListener menuFragmentActionListener) {
-        final MenuFragment menuFragment = new MenuFragment();
-        menuFragment.menuFragmentActionListener = menuFragmentActionListener;
-        return menuFragment;
-    }
+    private FragmentsViewModel fragmentsViewModel;
 
     public MenuFragment() {
         super(R.layout.fragment_menu);
@@ -32,21 +27,27 @@ public class MenuFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        fragmentsViewModel = new ViewModelProvider(requireActivity()).get(FragmentsViewModel.class);
+
         setButtonOnClickListener(view.findViewById(R.id.menuButton1), "111");
         setButtonOnClickListener(view.findViewById(R.id.menuButton2), "222");
         setButtonOnClickListener(view.findViewById(R.id.menuButton3), "333");
-        view.findViewById(R.id.backButton).setOnClickListener(v -> menuFragmentActionListener.backPressed(ButtonFragment.BUTTON_TO_TEXT));
+        view.findViewById(R.id.backButton).setOnClickListener(v -> fragmentsViewModel.setBackPressed(true));
 
-        new ViewModelProvider(requireActivity()).get(FragmentsViewModel.class)
-                .getFragmentType()
-                .observe(getViewLifecycleOwner(), newFragmentType -> getView()
+        fragmentsViewModel
+                .getFragmentDescription()
+                .observe(getViewLifecycleOwner(), fragmentDescription -> getView()
                         .findViewById(R.id.backButton)
-                        .setVisibility(newFragmentType == FragmentsViewModel.FragmentType.BUTTON ? View.INVISIBLE : View.VISIBLE));
+                        .setVisibility((null == fragmentDescription || !fragmentDescription.getFragmentType().isBackVisible())
+                                || Configuration.ORIENTATION_PORTRAIT == getResources().getConfiguration().orientation
+                                ? View.INVISIBLE : View.VISIBLE));
 
         return view;
     }
 
     private void setButtonOnClickListener(Button button, String text) {
-        button.setOnClickListener(view -> menuFragmentActionListener.showButtonFragment(text));
+        button.setOnClickListener(view -> fragmentsViewModel.setFragmentDescription(
+                new FragmentDescription(FragmentType.BUTTON, text, true)));
     }
 }

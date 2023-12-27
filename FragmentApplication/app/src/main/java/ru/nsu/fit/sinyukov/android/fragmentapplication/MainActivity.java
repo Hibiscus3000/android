@@ -1,5 +1,7 @@
 package ru.nsu.fit.sinyukov.android.fragmentapplication;
 
+import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
+
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.window.OnBackInvokedDispatcher;
@@ -7,16 +9,18 @@ import android.window.OnBackInvokedDispatcher;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.os.BuildCompat;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.ButtonFragment;
+import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.FragmentDescription;
+import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.FragmentType;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.MenuFragment;
-import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.MenuFragmentActionListener;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.fragment.TextFragment;
 
-public class MainActivity extends AppCompatActivity implements MenuFragmentActionListener {
+public class MainActivity extends AppCompatActivity {
 
+    public static final String ADD_TEXT = "Add text";
+    public static final String ADD_BUTTON = "Add button";
     private static final String INITIAL_TEXT = "Initial text";
 
     private FragmentsViewModel fragmentsViewModel;
@@ -29,17 +33,27 @@ public class MainActivity extends AppCompatActivity implements MenuFragmentActio
         setContentView(R.layout.activity_main);
 
         fragmentsViewModel = new ViewModelProvider(this).get(FragmentsViewModel.class);
+        fragmentsViewModel.getBackPressed().observe(this, backPressed -> {
+            if (backPressed) {
+                backPressed();
+                fragmentsViewModel.setBackPressed(false);
+            }
+        });
+        fragmentsViewModel.getFragmentDescription().observe(this, fragmentDescription -> {
+            if (null != fragmentDescription && fragmentDescription.getChangeView()) {
+                addFragmentFromViewModel();
+            }
+        });
 
         inLandscape = Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation;
 
-        if (inLandscape || null == savedInstanceState) {
+        if (null == savedInstanceState) {
             createMenu();
-        }
-        if (null != savedInstanceState) {
-            showFragmentFromViewModel();
+        } else {
+            restoreBackStack();
         }
         if (inLandscape && null == savedInstanceState) {
-            showButtonFragment(INITIAL_TEXT);
+            addFragmentToViewModel(FragmentType.BUTTON, INITIAL_TEXT);
         }
 
         if (BuildCompat.isAtLeastT()) {
@@ -57,50 +71,63 @@ public class MainActivity extends AppCompatActivity implements MenuFragmentActio
 
     private void createMenu() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container1, MenuFragment.create(this))
+                .replace(R.id.container1, new MenuFragment())
                 .commit();
     }
 
     private void backPressed() {
-        if (0 != getSupportFragmentManager().getBackStackEntryCount()) {
-            popBackStack(null);
-        } else {
+        if (inLandscape && getSupportFragmentManager().getBackStackEntryCount() <= 1
+                || getSupportFragmentManager().getBackStackEntryCount() <= 0) {
             finish();
+        } else {
+            final FragmentDescription fragmentDescription = fragmentsViewModel.getFragmentDescription().getValue();
+            fragmentsViewModel.setFragmentType(fragmentDescription.getFragmentType().getPrevious(), false);
+            getSupportFragmentManager().popBackStack();
         }
     }
 
-    // could delete this and use backPressed() instead
-    @Override
-    public void backPressed(String transactionName) {
-        popBackStack(transactionName);
+    private void restoreBackStack() {
+        while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+        }
+
+        final FragmentDescription fragmentDescription = fragmentsViewModel.getFragmentDescription().getValue();
+        if (null == fragmentDescription || FragmentType.NOTHING == fragmentDescription.getFragmentType()) {
+            if (inLandscape) {
+                addFragmentToViewModel(FragmentType.BUTTON, INITIAL_TEXT);
+            }
+            return;
+        }
+        for (FragmentType fragmentType : FragmentType.getSequence()) {
+            addFragment(new FragmentDescription(fragmentType, fragmentDescription.getText(), true));
+            if (fragmentType == fragmentDescription.getFragmentType()) {
+                break;
+            }
+        }
     }
 
-    private void popBackStack(String transactionName) {
-        fragmentsViewModel.setFragmentType(FragmentsViewModel.FragmentType.BUTTON);
-        getSupportFragmentManager().popBackStack(
-                transactionName, null == transactionName ? 0 : FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    private void addFragmentToViewModel(FragmentType fragmentType, String text) {
+        fragmentsViewModel.setFragmentDescription(new FragmentDescription(fragmentType, text, true));
     }
 
-    private void showFragmentFromViewModel() {
-        showFragment(fragmentsViewModel.getFragmentType().getValue(), fragmentsViewModel.getText().getValue());
+    private void addFragmentFromViewModel() {
+        addFragment(fragmentsViewModel.getFragmentDescription().getValue());
     }
 
-    private void showFragment(FragmentsViewModel.FragmentType fragmentType, String text) {
-        boolean isButton = FragmentsViewModel.FragmentType.BUTTON == fragmentType;
+    private void addFragment(FragmentDescription fragmentDescription) {
+        final FragmentType fragmentType = fragmentDescription.getFragmentType();
+        final String text = fragmentDescription.getText();
 
-        fragmentsViewModel.setFragmentType(fragmentType);
-        fragmentsViewModel.setText(text);
-        popBackStack(isButton ? ButtonFragment.ADD_BUTTON : ButtonFragment.BUTTON_TO_TEXT);
+        final boolean isButton = FragmentType.BUTTON == fragmentType;
+
+        final String transactionName = isButton ? ADD_BUTTON : ADD_TEXT;
+
+        getSupportFragmentManager().popBackStack(transactionName, POP_BACK_STACK_INCLUSIVE);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(inLandscape ? R.id.container2 : R.id.container1,
                         isButton ? ButtonFragment.create(text) : TextFragment.create(text))
-                .addToBackStack(ButtonFragment.ADD_BUTTON)
+                .addToBackStack(transactionName)
                 .commit();
-    }
-
-    @Override
-    public void showButtonFragment(String text) {
-        showFragment(FragmentsViewModel.FragmentType.BUTTON, text);
     }
 }

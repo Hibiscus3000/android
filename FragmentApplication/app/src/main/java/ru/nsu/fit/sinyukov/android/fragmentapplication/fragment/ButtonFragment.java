@@ -1,6 +1,5 @@
 package ru.nsu.fit.sinyukov.android.fragmentapplication.fragment;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,11 +16,8 @@ import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
 public class ButtonFragment extends Fragment {
 
-    private static String ARG_TEXT = "text";
-    public static String BUTTON_TO_TEXT = "Button to text";
-    public static String ADD_BUTTON = "Add button";
-
-    private FragmentsViewModel visibilityViewModel;
+    private static final String ARG_TEXT = "text";
+    private FragmentsViewModel fragmentsViewModel;
 
     public static ButtonFragment create(String text) {
         final ButtonFragment buttonFragment = new ButtonFragment();
@@ -43,16 +39,9 @@ public class ButtonFragment extends Fragment {
         final String text = getArguments().getString(ARG_TEXT);
         button.setText(text);
 
-        visibilityViewModel = new ViewModelProvider(requireActivity()).get(FragmentsViewModel.class);
+        fragmentsViewModel = new ViewModelProvider(requireActivity()).get(FragmentsViewModel.class);
 
-        button.setOnClickListener(v -> {
-            boolean inLandscape = Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation;
-            getParentFragmentManager().beginTransaction()
-                    .replace(inLandscape ? R.id.container2 : R.id.container1, TextFragment.create(text))
-                    .addToBackStack(BUTTON_TO_TEXT)
-                    .commit();
-            visibilityViewModel.setFragmentType(FragmentsViewModel.FragmentType.TEXT);
-        });
+        button.setOnClickListener(v -> fragmentsViewModel.setFragmentType(FragmentType.TEXT, true));
         return view;
     }
 }

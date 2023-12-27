@@ -32,8 +32,8 @@ public class TextFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
-        final TextView button = view.findViewById(R.id.textView);
-        button.setText(getArguments().getString(ARG_TEXT));
+        final TextView textView = view.findViewById(R.id.textView);
+        textView.setText(getArguments().getString(ARG_TEXT));
         return view;
     }
 }
