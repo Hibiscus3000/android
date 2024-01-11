@@ -13,6 +13,9 @@ public class FragmentsViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> backPressed = new MutableLiveData<>(false);
 
+    private final MutableLiveData<Integer> fragmentCounter = new MutableLiveData<>(0);
+    private int numberOfFragments = 0;
+
     public LiveData<FragmentDescription> getFragmentDescription() {
         return fragmentDescription;
     }
@@ -37,5 +40,23 @@ public class FragmentsViewModel extends ViewModel {
 
     public void setBackPressed(Boolean backPressed) {
         this.backPressed.postValue(backPressed);
+    }
+
+    public LiveData<Integer> getFragmentCounter() {
+        return fragmentCounter;
+    }
+
+    public void setFragmentCounter(int fragmentCounter) {
+        this.fragmentCounter.postValue(fragmentCounter);
+    }
+
+    public synchronized void incrementCounter() {
+        ++numberOfFragments;
+        setFragmentCounter(numberOfFragments);
+    }
+
+    public void decrementCounter() {
+        --numberOfFragments;
+        setFragmentCounter(numberOfFragments);
     }
 }

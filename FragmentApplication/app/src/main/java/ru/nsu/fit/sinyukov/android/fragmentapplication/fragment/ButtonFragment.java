@@ -8,13 +8,12 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import ru.nsu.fit.sinyukov.android.fragmentapplication.FragmentsViewModel;
 import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
-public class ButtonFragment extends Fragment {
+public class ButtonFragment extends CountedFragment {
 
     private static final String ARG_TEXT = "text";
     private FragmentsViewModel fragmentsViewModel;

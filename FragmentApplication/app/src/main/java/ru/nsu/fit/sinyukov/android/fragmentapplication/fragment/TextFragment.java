@@ -8,11 +8,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import ru.nsu.fit.sinyukov.android.fragmentapplication.R;
 
-public class TextFragment extends Fragment {
+public class TextFragment extends CountedFragment {
 
     private static String ARG_TEXT = "text";
 

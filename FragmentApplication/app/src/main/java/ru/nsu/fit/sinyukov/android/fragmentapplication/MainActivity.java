@@ -4,6 +4,7 @@ import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.window.OnBackInvokedDispatcher;
 
 import androidx.activity.OnBackPressedCallback;
@@ -33,17 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         fragmentsViewModel = new ViewModelProvider(this).get(FragmentsViewModel.class);
-        fragmentsViewModel.getBackPressed().observe(this, backPressed -> {
-            if (backPressed) {
-                backPressed();
-                fragmentsViewModel.setBackPressed(false);
-            }
-        });
-        fragmentsViewModel.getFragmentDescription().observe(this, fragmentDescription -> {
-            if (null != fragmentDescription && fragmentDescription.getChangeView()) {
-                addFragmentFromViewModel();
-            }
-        });
+        setFragmentObservers();
 
         inLandscape = Configuration.ORIENTATION_LANDSCAPE == getResources().getConfiguration().orientation;
 
@@ -67,6 +58,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void setFragmentObservers() {
+        fragmentsViewModel.getBackPressed().observe(this, backPressed -> {
+            if (backPressed) {
+                backPressed();
+                fragmentsViewModel.setBackPressed(false);
+            }
+        });
+        fragmentsViewModel.getFragmentDescription().observe(this, fragmentDescription -> {
+            if (null != fragmentDescription && fragmentDescription.getChangeView()) {
+                addFragmentFromViewModel();
+            }
+        });
+        fragmentsViewModel.getFragmentCounter().observe(this, fragmentCounter ->
+                ((TextView) findViewById(R.id.fragmentCounterTextView)).setText("Number of fragments = " + fragmentCounter));
+
     }
 
     private void createMenu() {
